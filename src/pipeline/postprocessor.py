@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
 
-from src.config import CLASS_COLORS, CROP_LEFT, CROP_RIGHT, CROP_TOP_1920, CROP_TOP_OTHER, DIRTY_CLASSES
+from src.config import CLASS_COLORS, CROP_LEFT, CROP_RIGHT, CROP_TOP_1920, CROP_TOP_OTHER
 from src.entities import SegmentationResult
+from src.pipeline.ciss import CISSCalculator
 
 class Postprocessor:
 
@@ -10,6 +11,7 @@ class Postprocessor:
         self.threshold = threshold
         self.alpha = alpha
         self.colors = colors or CLASS_COLORS
+        self._ciss_calculator = CISSCalculator()
 
     def _sigmoid(self, x):
         return 1.0 / (1.0 + np.exp(-x))
@@ -55,23 +57,10 @@ class Postprocessor:
         )[active]
         return result
 
-    def calc_ciss(self, masks):
-        total = masks.shape[1] * masks.shape[2]
-        if total == 0:
-            return 0.0, {}
-        ciss = 0.0
-        class_scores = {}
-        for cls_id, weight in DIRTY_CLASSES.items():
-            if cls_id < masks.shape[0]:
-                score = float(masks[cls_id].sum()) / total
-                class_scores[cls_id] = score
-                ciss += weight * score
-        return ciss, class_scores
-
     def __call__(self, logits, orig_bgr, cropped_bgr, scale, pad_top, pad_left):
         masks = self.build_mask(logits, cropped_bgr.shape[:2], scale, pad_top, pad_left)
         overlay_crop = self.overlay_mask(cropped_bgr, masks)
-        ciss, class_scores = self.calc_ciss(masks)
+        ciss, class_scores = self._ciss_calculator.calculate(masks)
 
         h, w = orig_bgr.shape[:2]
         left = int(w * CROP_LEFT)

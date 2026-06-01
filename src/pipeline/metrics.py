@@ -1,7 +1,6 @@
 import collections
 
 import numpy as np
-import cv2
 
 from src.config import DIRTY_CLASSES, GRAPH_WINDOW_SEC, SMOOTHING_WINDOW
 

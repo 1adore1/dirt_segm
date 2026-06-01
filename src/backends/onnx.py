@@ -18,5 +18,6 @@ class ONNXBackend(InferenceBackend):
         self._input_name = self._session.get_inputs()[0].name
 
     def infer(self, tensor):
-        assert self._session is not None, 'model not loaded'
+        if self._session is None:
+            raise RuntimeError('model not loaded, call load_model() first')
         return self._session.run(None, {self._input_name: tensor})[0]

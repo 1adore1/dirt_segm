@@ -25,9 +25,10 @@ class RKNNBackend(InferenceBackend):
         ret = self._rknn.init_runtime(core_mask=self._core_mask)
         if ret != 0:
             raise RuntimeError(f'failed to init rknn runtime (code {ret})')
-
+        
     def infer(self, tensor):
-        assert self._rknn is not None, 'model not loaded'
+        if self._rknn is None:
+            raise RuntimeError('model not loaded, call load_model() first')
         return self._rknn.inference(inputs=[tensor])[0]
 
     def release(self):

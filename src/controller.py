@@ -8,8 +8,8 @@ from src.pipeline.metrics import MetricsCalculator
 from src.pipeline.segmentation import SegmentationPipeline
 from src.visualization.renderer import OverlayRenderer
 from src.io import FileManager
-from src.backends.base import InferenceBackend
 
+from src.backends.factory import load_backend
 
 class ProcessingController:
 
@@ -19,7 +19,7 @@ class ProcessingController:
         self._file_manager = FileManager()
 
     def run(self, config):
-        backend = InferenceBackend().load(config.model_path)
+        backend = load_backend(config.model_path)
         self._pipeline = SegmentationPipeline(backend, threshold=config.threshold, alpha=config.alpha)
         self._file_manager.ensure_dir(config.output_dir)
 

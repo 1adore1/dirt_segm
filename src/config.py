@@ -55,7 +55,8 @@ GRAPH_WINDOW_SEC = 30
 SMOOTHING_WINDOW = 5
 
 class Config:
-    def __init__(self, model_path, input_path, output_dir, threshold=0.5, alpha=0.45, fps=25.0, backend='onnx'):
+
+    def __init__(self, model_path, input_path, output_dir, threshold=0.5, alpha=0.45, fps=25.0):
         self.model_path = model_path
         self.input_path = input_path
         self.output_dir = output_dir

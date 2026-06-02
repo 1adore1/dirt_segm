@@ -33,7 +33,7 @@ class ProcessingController:
         self._metrics.reset(fps=config.fps)
         result = self._pipeline.process_frame(frame)
         self._metrics.add_frame(result.ciss, result.class_scores)
-        out_frame = self._overlay.render(result.overlay_image, result, self._metrics)
+        out_frame = self._overlay.render(result.overlay_image, result, self._metrics, False)
 
         name = os.path.splitext(os.path.basename(config.input_path))[0]
         out_path = os.path.join(config.output_dir, f'{name}_segm.jpg')
@@ -58,7 +58,7 @@ class ProcessingController:
                 break
             result = self._pipeline.process_frame(frame)
             self._metrics.add_frame(result.ciss, result.class_scores)
-            out_frame = self._overlay.render(result.overlay_image, result, self._metrics)
+            out_frame = self._overlay.render(result.overlay_image, result, self._metrics, True)
 
             if writer is None:
                 h, w = out_frame.shape[:2]

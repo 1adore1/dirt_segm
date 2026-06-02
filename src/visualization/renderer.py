@@ -61,7 +61,7 @@ class OverlayRenderer:
         self._display_ciss = None
         self._display_scores = {cls_id: 0.0 for cls_id in DIRTY_CLASSES}
 
-    def render(self, frame, result, metrics):
+    def render(self, frame, result, metrics, is_video):
         display_ciss, display_scores = self._smooth_display(
             result.ciss, result.class_scores, metrics._fps
         )
@@ -70,7 +70,10 @@ class OverlayRenderer:
         draw = ImageDraw.Draw(image_pil)
         graph_y = 220
         self._draw_contamination_indicator(draw, image_pil.width, display_ciss, graph_y)
-        graph_img = self._render_graph(metrics)
+        if is_video:
+            graph_img = self._render_line(metrics)
+        else:
+            graph_img = self._render_bar(metrics)
         if graph_img is not None:
             image_pil.paste(graph_img, (24, graph_y), graph_img)
         return cv2.cvtColor(np.array(image_pil), cv2.COLOR_RGBA2BGR)
@@ -91,8 +94,6 @@ class OverlayRenderer:
     def _render_graph(self, metrics):
         if len(metrics.time_axis) == 0:
             return None
-        if len(metrics.time_axis) == 1:
-            return self._render_bar(metrics)
         return self._render_line(metrics)
 
     def _render_bar(self, metrics):

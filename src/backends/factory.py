@@ -2,6 +2,8 @@ import os
 from src.config import BACKEND_BY_EXT
 
 def load_backend(model_path: str):
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f'model not found: {model_path}')
     ext = os.path.splitext(model_path)[1].lower()
     backend_name = BACKEND_BY_EXT.get(ext)
     if backend_name is None:
